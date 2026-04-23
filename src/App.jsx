@@ -1,5 +1,5 @@
 // src/App.jsx
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { DEFAULT_GAMES } from './games'
 import { MONTHS } from './dates'
 import { usePoll } from './usePoll'
@@ -17,6 +17,22 @@ export default function App() {
   const [hasVoted, setHasVoted]       = useState(false)
   const [selectedDates, setSelectedDates] = useState(new Set())
   const [hasSavedDates, setHasSavedDates] = useState(false)
+  const [showReset, setShowReset]         = useState(false)
+  const konamiRef = useRef([])
+
+  const KONAMI = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a']
+
+  useEffect(() => {
+    const handleKey = (e) => {
+      const seq = [...konamiRef.current, e.key].slice(-KONAMI.length)
+      konamiRef.current = seq
+      if (seq.join(',') === KONAMI.join(',') && name.toLowerCase() === 'jeffrey') {
+        setShowReset(true)
+      }
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [name])
 
   const {
     votes, customGames, loading, tally, totalVoters,
@@ -101,6 +117,8 @@ export default function App() {
     setHasSavedDates(false)
     setName('')
     setNameInput('')
+    setShowReset(false)
+    konamiRef.current = []
     setStep('login')
     showStatus('✓ Alles gereset', 'success')
   }
@@ -380,9 +398,11 @@ export default function App() {
             </button>
           </div>
 
-          <div className="admin">
-            <button className="reset-btn" onClick={handleReset}>✕ Reset alles</button>
-          </div>
+          {showReset && (
+            <div className="admin">
+              <button className="reset-btn" onClick={handleReset}>✕ Reset alles</button>
+            </div>
+          )}
         </div>
       )}
     </div>
