@@ -168,6 +168,11 @@ export default function App() {
             </button>
           </div>
           <div className="login-footer">
+            <div className="login-stats">
+              <span>{totalVoters}/10 gestemd</span>
+              <span className="login-stats-sep">·</span>
+              <span>{totalAvailability}/10 beschikbaar</span>
+            </div>
             <span className="blink">INSERT COIN</span>
           </div>
         </div>

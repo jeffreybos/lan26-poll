@@ -129,7 +129,9 @@ h1 { font-family: 'Press Start 2P', monospace; font-size: clamp(14px, 3vw, 22px)
 .login-cursor { color: var(--green); text-shadow: var(--glow); font-size: 22px; flex-shrink: 0; }
 .login-input { background: transparent; border: none; color: var(--text); font-family: 'VT323', monospace; font-size: 22px; outline: none; width: 100%; }
 .login-input::placeholder { color: var(--dim); }
-.login-footer { font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--dim); letter-spacing: 2px; }
+.login-footer { font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--dim); letter-spacing: 2px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.login-stats { display: flex; gap: 8px; align-items: center; color: var(--blue); font-size: 8px; }
+.login-stats-sep { color: var(--dim); }
 .login-scanline { position: fixed; inset: 0; pointer-events: none; background: repeating-linear-gradient(to bottom, transparent 0px, transparent 3px, rgba(0,255,65,0.02) 3px, rgba(0,255,65,0.02) 4px); z-index: 1; }
 
 /* Step bar */
