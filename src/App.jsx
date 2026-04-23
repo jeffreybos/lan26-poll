@@ -276,6 +276,9 @@ export default function App() {
           </div>
 
           <div className="nav-row">
+            <button className="skip-btn" onClick={() => setStep('availability')}>
+              ← beschikbaarheid aanpassen
+            </button>
             <button className="skip-btn" onClick={() => setStep('results')}>
               resultaten bekijken →
             </button>
@@ -369,8 +372,11 @@ export default function App() {
           )}
 
           <div className="nav-row" style={{ marginTop: '2rem' }}>
+            <button className="skip-btn" onClick={() => setStep('availability')}>
+              ← beschikbaarheid aanpassen
+            </button>
             <button className="skip-btn" onClick={() => setStep('vote')}>
-              ← terug naar stemmen
+              ← stem aanpassen
             </button>
           </div>
 
