@@ -58,9 +58,15 @@ export function usePoll() {
   }, [])
 
   const resetAll = useCallback(async () => {
-    await remove(ref(db, 'votes'))
-    await remove(ref(db, 'customGames'))
-    await remove(ref(db, 'availability'))
+    const [votesSnap, availSnap] = await Promise.all([
+      get(ref(db, 'votes')),
+      get(ref(db, 'availability')),
+    ])
+    const deletes = []
+    votesSnap.forEach(child => deletes.push(remove(child.ref)))
+    availSnap.forEach(child => deletes.push(remove(child.ref)))
+    deletes.push(remove(ref(db, 'customGames')))
+    await Promise.all(deletes)
   }, [])
 
   // Tally votes
