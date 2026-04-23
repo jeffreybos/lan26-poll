@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react'
 import { DEFAULT_GAMES } from './games'
 import { MONTHS } from './dates'
 import { usePoll } from './usePoll'
+import SnakeGame from './SnakeGame'
 import './App.css'
 
 // step: 'login' | 'availability' | 'vote' | 'results'
@@ -18,6 +19,7 @@ export default function App() {
   const [selectedDates, setSelectedDates] = useState(new Set())
   const [hasSavedDates, setHasSavedDates] = useState(false)
   const [showReset, setShowReset]         = useState(false)
+  const [showSnake, setShowSnake]         = useState(false)
   const konamiRef = useRef([])
 
   const KONAMI = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a']
@@ -26,8 +28,12 @@ export default function App() {
     const handleKey = (e) => {
       const seq = [...konamiRef.current, e.key].slice(-KONAMI.length)
       konamiRef.current = seq
-      if (seq.join(',') === KONAMI.join(',') && name.toLowerCase() === 'jeffrey') {
-        setShowReset(true)
+      if (seq.join(',') === KONAMI.join(',')) {
+        if (name.toLowerCase() === 'jeffrey') {
+          setShowReset(true)
+        } else {
+          setShowSnake(true)
+        }
       }
     }
     window.addEventListener('keydown', handleKey)
@@ -128,6 +134,7 @@ export default function App() {
 
   return (
     <div className="container">
+      {showSnake && <SnakeGame onClose={() => setShowSnake(false)} />}
       {status && <div className={`status status--${status.type}`}>{status.msg}</div>}
 
       {/* ---- LOGIN ---- */}
