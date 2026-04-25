@@ -49,15 +49,17 @@ export default function App() {
   }, [name])
 
   // Menu keyboard navigation
+  const menuReadyRef = useRef(false)
   useEffect(() => {
-    if (step !== 'menu') return
+    if (step !== 'menu') { menuReadyRef.current = false; return }
+    const t = setTimeout(() => { menuReadyRef.current = true }, 300)
     const handleKey = (e) => {
-      if (e.key === 'ArrowUp')   { setMenuIndex(i => (i - 1 + MENU_ITEMS.length) % MENU_ITEMS.length) }
-      if (e.key === 'ArrowDown') { setMenuIndex(i => (i + 1) % MENU_ITEMS.length) }
-      if (e.key === 'Enter')     { setStep(MENU_ITEMS[menuIndex].key) }
+      if (e.key === 'ArrowUp')                          { setMenuIndex(i => (i - 1 + MENU_ITEMS.length) % MENU_ITEMS.length) }
+      if (e.key === 'ArrowDown')                        { setMenuIndex(i => (i + 1) % MENU_ITEMS.length) }
+      if (e.key === 'Enter' && menuReadyRef.current)    { setStep(MENU_ITEMS[menuIndex].key) }
     }
     window.addEventListener('keydown', handleKey)
-    return () => window.removeEventListener('keydown', handleKey)
+    return () => { clearTimeout(t); window.removeEventListener('keydown', handleKey) }
   }, [step, menuIndex])
 
   const {
