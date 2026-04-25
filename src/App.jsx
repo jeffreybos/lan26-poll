@@ -6,7 +6,13 @@ import { usePoll } from './usePoll'
 import SnakeGame from './SnakeGame'
 import './App.css'
 
-// step: 'login' | 'availability' | 'vote' | 'results'
+// step: 'login' | 'menu' | 'availability' | 'vote' | 'results'
+
+const MENU_ITEMS = [
+  { key: 'availability', label: 'BESCHIKBAARHEID' },
+  { key: 'vote',         label: 'STEMMEN'         },
+  { key: 'results',      label: 'RESULTATEN'      },
+]
 
 export default function App() {
   const [step, setStep]               = useState('login')
@@ -18,12 +24,14 @@ export default function App() {
   const [hasVoted, setHasVoted]       = useState(false)
   const [selectedDates, setSelectedDates] = useState(new Set())
   const [hasSavedDates, setHasSavedDates] = useState(false)
+  const [menuIndex, setMenuIndex]         = useState(0)
   const [showReset, setShowReset]         = useState(false)
   const [showSnake, setShowSnake]         = useState(false)
   const konamiRef = useRef([])
 
   const KONAMI = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a']
 
+  // Konami code listener
   useEffect(() => {
     const handleKey = (e) => {
       const seq = [...konamiRef.current, e.key].slice(-KONAMI.length)
@@ -39,6 +47,18 @@ export default function App() {
     window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
   }, [name])
+
+  // Menu keyboard navigation
+  useEffect(() => {
+    if (step !== 'menu') return
+    const handleKey = (e) => {
+      if (e.key === 'ArrowUp')   { setMenuIndex(i => (i - 1 + MENU_ITEMS.length) % MENU_ITEMS.length) }
+      if (e.key === 'ArrowDown') { setMenuIndex(i => (i + 1) % MENU_ITEMS.length) }
+      if (e.key === 'Enter')     { setStep(MENU_ITEMS[menuIndex].key) }
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [step, menuIndex])
 
   const {
     votes, customGames, loading, tally, totalVoters,
@@ -61,9 +81,9 @@ export default function App() {
       getExistingVote(trimmed),
       getExistingAvailability(trimmed),
     ])
-    if (prevVote?.games) { setSelected(new Set(prevVote.games)); setHasVoted(true) }
+    if (prevVote?.games)  { setSelected(new Set(prevVote.games));     setHasVoted(true)    }
     if (prevAvail?.dates) { setSelectedDates(new Set(prevAvail.dates)); setHasSavedDates(true) }
-    setStep('availability')
+    setStep('menu')
   }
 
   const toggleDate = (date) => {
@@ -87,7 +107,7 @@ export default function App() {
     await submitAvailability(name, Array.from(selectedDates))
     setHasSavedDates(true)
     showStatus('✓ Beschikbaarheid opgeslagen!', 'success')
-    setTimeout(() => setStep('vote'), 800)
+    setTimeout(() => setStep('menu'), 800)
   }
 
   const handleAddCustomGame = async () => {
@@ -111,7 +131,7 @@ export default function App() {
     await submitVote(name, Array.from(selected))
     setHasVoted(true)
     showStatus('✓ Stem opgeslagen!', 'success')
-    setTimeout(() => setStep('results'), 800)
+    setTimeout(() => setStep('menu'), 800)
   }
 
   const handleReset = async () => {
@@ -131,6 +151,17 @@ export default function App() {
 
   const canSubmitDates = selectedDates.size > 0
   const canSubmit      = selected.size > 0
+
+  const PageHeader = () => (
+    <header>
+      <h1>👾 LAN '26 👾</h1>
+      <div className="subtitle">OLD BUT GOLD EDITIE</div>
+    </header>
+  )
+
+  const BackBtn = () => (
+    <button className="skip-btn" onClick={() => setStep('menu')}>← menu</button>
+  )
 
   return (
     <div className="container">
@@ -159,11 +190,7 @@ export default function App() {
                 autoFocus
               />
             </div>
-            <button
-              className="submit-btn"
-              onClick={handleLogin}
-              disabled={!nameInput.trim()}
-            >
+            <button className="submit-btn" onClick={handleLogin} disabled={!nameInput.trim()}>
               ► PRESS START ◄
             </button>
           </div>
@@ -178,26 +205,43 @@ export default function App() {
         </div>
       )}
 
+      {/* ---- MENU ---- */}
+      {step === 'menu' && (
+        <div className="menu-screen">
+          <div className="login-header">
+            <h1>👾 LAN '26 👾</h1>
+            <div className="subtitle">OLD BUT GOLD EDITIE</div>
+          </div>
+          <div className="menu-player">PLAYER: {name.toUpperCase()}</div>
+          <div className="menu-box">
+            {MENU_ITEMS.map((item, i) => {
+              const done = item.key === 'availability' ? hasSavedDates : item.key === 'vote' ? hasVoted : false
+              return (
+                <div
+                  key={item.key}
+                  className={`menu-item ${menuIndex === i ? 'menu-item--active' : ''}`}
+                  onClick={() => setStep(item.key)}
+                  onMouseEnter={() => setMenuIndex(i)}
+                >
+                  <span className="menu-cursor">{menuIndex === i ? '►' : '\u00A0\u00A0'}</span>
+                  <span className="menu-label">{item.label}</span>
+                  {done && <span className="menu-done">✓</span>}
+                </div>
+              )
+            })}
+          </div>
+          <div className="menu-hint">↑ ↓ navigeren · ENTER selecteren</div>
+        </div>
+      )}
+
       {/* ---- AVAILABILITY ---- */}
       {step === 'availability' && (
         <div>
-          <header>
-            <h1>👾 LAN '26 👾</h1>
-            <div className="subtitle">OLD BUT GOLD EDITIE</div>
-          </header>
-
-          <div className="step-bar">
-            <div className="step-item step-item--done">1. LOGIN</div>
-            <div className="step-sep">▶</div>
-            <div className="step-item step-item--active">2. BESCHIKBAARHEID</div>
-            <div className="step-sep">▶</div>
-            <div className="step-item">3. STEMMEN</div>
-          </div>
-
+          <PageHeader />
           <div className="player-tag">► {name}</div>
 
           {hasSavedDates && (
-            <div className="voted-banner">✓ Beschikbaarheid al opgeslagen — pas aan of ga verder.</div>
+            <div className="voted-banner">✓ Beschikbaarheid al opgeslagen — pas aan of ga terug naar het menu.</div>
           )}
 
           <div className="instruction" style={{ marginBottom: '1rem' }}>
@@ -225,15 +269,9 @@ export default function App() {
           ))}
 
           <div className="nav-row">
-            <button className="skip-btn" onClick={() => setStep('vote')}>
-              overslaan →
-            </button>
-            <button
-              className="submit-btn nav-submit"
-              onClick={handleSubmitAvailability}
-              disabled={!canSubmitDates}
-            >
-              ► Opslaan & verder ◄
+            <BackBtn />
+            <button className="submit-btn nav-submit" onClick={handleSubmitAvailability} disabled={!canSubmitDates}>
+              ► Opslaan ◄
             </button>
           </div>
         </div>
@@ -242,23 +280,11 @@ export default function App() {
       {/* ---- VOTE ---- */}
       {step === 'vote' && (
         <div>
-          <header>
-            <h1>👾 LAN '26 👾</h1>
-            <div className="subtitle">OLD BUT GOLD EDITIE</div>
-          </header>
-
-          <div className="step-bar">
-            <div className="step-item step-item--done">1. LOGIN</div>
-            <div className="step-sep">▶</div>
-            <div className="step-item step-item--done">2. BESCHIKBAARHEID</div>
-            <div className="step-sep">▶</div>
-            <div className="step-item step-item--active">3. STEMMEN</div>
-          </div>
-
+          <PageHeader />
           <div className="player-tag">► {name}</div>
 
           {hasVoted && (
-            <div className="voted-banner">✓ Stem al opgeslagen — pas aan of bekijk de resultaten.</div>
+            <div className="voted-banner">✓ Stem al opgeslagen — pas aan of ga terug naar het menu.</div>
           )}
 
           <div className="instruction" style={{ marginBottom: '1.2rem' }}>
@@ -306,17 +332,8 @@ export default function App() {
           </div>
 
           <div className="nav-row">
-            <button className="skip-btn" onClick={() => setStep('availability')}>
-              ← beschikbaarheid aanpassen
-            </button>
-            <button className="skip-btn" onClick={() => setStep('results')}>
-              resultaten bekijken →
-            </button>
-            <button
-              className="submit-btn nav-submit"
-              onClick={handleSubmitVote}
-              disabled={!canSubmit}
-            >
+            <BackBtn />
+            <button className="submit-btn nav-submit" onClick={handleSubmitVote} disabled={!canSubmit}>
               ► Stem opslaan ◄
             </button>
           </div>
@@ -326,10 +343,7 @@ export default function App() {
       {/* ---- RESULTS ---- */}
       {step === 'results' && (
         <div>
-          <header>
-            <h1>👾 LAN '26 👾</h1>
-            <div className="subtitle">OLD BUT GOLD EDITIE</div>
-          </header>
+          <PageHeader />
 
           <div className="results-header">
             <div className="results-title">📊 Games</div>
@@ -358,7 +372,6 @@ export default function App() {
                   </div>
                 </div>
               ))}
-
               <div className="votes-list">
                 <div className="votes-list-title">► Alle stemmen:</div>
                 {Object.values(votes).map(v => (
@@ -402,12 +415,7 @@ export default function App() {
           )}
 
           <div className="nav-row" style={{ marginTop: '2rem' }}>
-            <button className="skip-btn" onClick={() => setStep('availability')}>
-              ← beschikbaarheid aanpassen
-            </button>
-            <button className="skip-btn" onClick={() => setStep('vote')}>
-              ← stem aanpassen
-            </button>
+            <BackBtn />
           </div>
 
           {showReset && (
