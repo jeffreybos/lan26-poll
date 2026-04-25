@@ -120,7 +120,7 @@ h1 { font-family: 'Press Start 2P', monospace; font-size: clamp(14px, 3vw, 22px)
 .reset-btn:hover { background: var(--red); color: var(--bg); }
 
 /* Login screen */
-.login-screen { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 32px; padding: 24px; margin-top: -24px; }
+.login-screen { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 32px; padding: 24px; margin-top: -24px; margin-bottom: -60px; }
 .login-header { text-align: center; }
 .login-box { width: 100%; max-width: 480px; border: 2px solid var(--green); padding: 32px; background: var(--panel); box-shadow: var(--glow); display: flex; flex-direction: column; gap: 24px; }
 .login-prompt { font-family: 'Press Start 2P', monospace; font-size: 10px; color: var(--green); text-shadow: var(--glow); letter-spacing: 3px; text-align: center; }
@@ -151,7 +151,7 @@ h1 { font-family: 'Press Start 2P', monospace; font-size: clamp(14px, 3vw, 22px)
 .skip-btn:hover { color: var(--text); }
 
 /* Main menu */
-.menu-screen { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; padding: 24px; margin-top: -24px; }
+.menu-screen { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; padding: 24px; margin-top: -24px; margin-bottom: -60px; }
 .menu-player { font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--blue); letter-spacing: 2px; }
 .menu-box { display: flex; flex-direction: column; gap: 4px; width: 100%; max-width: 480px; }
 .menu-item { display: flex; align-items: center; gap: 12px; padding: 14px 20px; border: 2px solid transparent; cursor: pointer; transition: all 0.1s; user-select: none; }
